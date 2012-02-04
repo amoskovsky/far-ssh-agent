@@ -79,7 +79,7 @@ BEGIN
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "far_ssh_agent.dll\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "pb2xls\0"
+            VALUE "ProductName", "far_ssh_agent\0"
             VALUE "ProductVersion", VERSION_STRING "\0"
             VALUE "SpecialBuild", "\0"
         END
