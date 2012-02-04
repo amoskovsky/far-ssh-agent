@@ -1,10 +1,8 @@
-import os, re, commands, helper, platform
-
+import os, helper, platform
 
 # init build env with OS env
 env = Environment(ENV = os.environ, TARGET_ARCH="x86")
 
-# import vars from parent SConscript file
 plugin_sources = ['far_ssh_agent.cpp', 'far_ssh_agent.def']
 
 # set include search dirs
@@ -13,35 +11,34 @@ env.Prepend(CPPPATH=['far-sdk'])
 extralibs = Split ("""kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib 
                       shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib""")
 
-# cl /Zp2 /O1igy /GF /Gr /GR- /GX- /LD HelloWorld.c /link /subsystem:console /machine:I386 /opt:nowin98 /noentry /nodefaultlib /def:HelloWorld.vc.def kernel32.lib advapi32.lib user32.lib /map:HelloWorld.map /merge:.rdata=.text
-
-version_info = helper.git_version_string()
-if version_info == '':
+version = helper.git_version_string()
+num_version = helper.git_version_to_numeric_version(version)
+if version == '':
     print 'Cannot get any info regarding this build from git.'
-    version_info = 'n/a'
+    version = 'n/a'
 else:
-    print 'Using [%s] as version info' % version_info
+    print 'Using [%s] as version info, [%s] as numeric version' % (version, num_version)
+
 
 if int(ARGUMENTS.get('debug', 0)) == 1:
      version_info += ' [debug build]'
 
 
-env.Append(CCFLAGS = [ '/EHsc', '/DWIN32', '/D_UNICODE', '/DUNICODE', '/DVERSION="%s"'%version_info ])  
+env.Append(CCFLAGS = [ '/EHsc', '/DWIN32', '/D_UNICODE', '/DUNICODE', '/DVERSION_STRING="%s"'%version ])  
+env.Append(RCFLAGS = [ r'/dVERSION_STRING=\"%s\"'%version, r'/dVERSION_NUMBER="%s"'%num_version ])  
 env.Append(LINKFLAGS = [
     '/MANIFEST', '/SUBSYSTEM:CONSOLE', '/OPT:REF', '/OPT:ICF', '/LTCG', '/DYNAMICBASE', 
     '/NXCOMPAT', '/MACHINE:x86', '/ERRORREPORT:PROMPT' 
 ])
 
-if int(ARGUMENTS.get('debug', 0)):
-    env.Append(CCFLAGS = ['/Od', '/Oi', '/GL', '/FD', '/MT', '/Gy']) # ['/Zp2', '/O1igy', '/GF', '/Gr', '/GR-', '/GX-', '/LD'])
-    env.Append(LINKFLAGS = [])
-else:
+if int(ARGUMENTS.get('debug', 0) == 0):
     env.Append(CCFLAGS = ['/Od', '/Oi', '/GL', '/FD', '/MT', '/Gy'])
     env.Append(LINKFLAGS = [])
+else:
+    raise Exception("Debug build is not supported yet")
 
 
-
-plugin_library = env.SharedLibrary(target = "far_ssh_agent.dll", LIBS=extralibs, source = plugin_sources);
+plugin_library = env.SharedLibrary(target = "far_ssh_agent.dll", LIBS=extralibs, source = plugin_sources + [ env.RES('version.rc')] );
 env.Alias('plugin', plugin_library)
 
 
