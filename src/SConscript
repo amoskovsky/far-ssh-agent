@@ -25,7 +25,7 @@ if int(ARGUMENTS.get('debug', 0)) == 1:
 
 
 env.Append(CCFLAGS = [ '/EHsc', '/DWIN32', '/D_UNICODE', '/DUNICODE', '/DVERSION_STRING="%s"'%version ])  
-env.Append(RCFLAGS = [ r'/dVERSION_STRING=\"%s\"'%version, r'/dVERSION_NUMBER="%s"'%num_version ])  
+env.Append(RCFLAGS = [ r'/dVERSION_STRING=\"%s\"'%version, r'/dVERSION_NUMBER=%s'%num_version ])  
 env.Append(LINKFLAGS = [
     '/MANIFEST', '/SUBSYSTEM:CONSOLE', '/OPT:REF', '/OPT:ICF', '/LTCG', '/DYNAMICBASE', 
     '/NXCOMPAT', '/MACHINE:x86', '/ERRORREPORT:PROMPT' 
