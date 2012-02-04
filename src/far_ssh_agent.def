@@ -1,0 +1,6 @@
+LIBRARY        far_ssh_agent
+; DESCRIPTION    'SSH Agent support for Far'
+EXPORTS
+  SetStartupInfoW
+  GetPluginInfoW
+  OpenPluginW
